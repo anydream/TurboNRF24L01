@@ -150,18 +150,17 @@ void TurboNRF24L01::Listen()
 
 void TurboNRF24L01::Send(uint8_t * val)
 {
-	uint8_t status = GetStatus();
-
+	// Wait until last paket is send
 	while (m_IsSendState)
 	{
-		status = GetStatus();
+		uint8_t status = GetStatus();
 
 		if ((status & ((1 << TX_DS) | (1 << MAX_RT))))
 		{
 			m_IsSendState = 0;
 			break;
 		}
-	}// Wait until last paket is send
+	}
 
 	m_CE.Low();
 
@@ -181,8 +180,8 @@ void TurboNRF24L01::GetRecvData(uint8_t * val)
 	m_CSN.Low();// Pull down chip select
 	m_SPI.Send(R_RX_PAYLOAD);// Send cmd to read rx payload
 	m_SPI.Receive(val, m_Payload);// Read payload
-	m_CSN.High();                               // Pull up chip select
-	WriteRegister(STATUS, (1 << RX_DR));   // Reset status register
+	m_CSN.High();// Pull up chip select
+	WriteRegister(STATUS, (1 << RX_DR));// Reset status register
 }
 
 bool TurboNRF24L01::IsSending()
